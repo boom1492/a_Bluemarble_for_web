@@ -3,11 +3,11 @@
 		<title>부루마블 뷰어 Bluemarble Viewer</title>
 		<meta http-equiv="Content-Type"	content="text/html; charset=euc-kr">
 		<!-- Junction -->
-		<script language='javascript' type='text/javascript' src='js/junction/json2.js'></script>
-		<script language='javascript' type='text/javascript' src='js/junction/strophe.js'></script>
-		<script language='javascript' type='text/javascript' src='js/junction/junction.js'></script>
+		<script language='javascript' type='text/javascript' src='./js/junction/json2.js'></script>
+		<script language='javascript' type='text/javascript' src='./js/junction/strophe.js'></script>
+		<script language='javascript' type='text/javascript' src='./js/junction/junction.js'></script>
 		<!-- JQuery -->
-		<script type="text/javascript" src="js/jquery/jquery.min.js"></script>  
+		<script type="text/javascript" src="./js/jquery/jquery.min.js"></script>  
 		<!-- Game Script -->
 		<script type="text/javascript" src="./js/BlueMarble.js"></script>
 		<script type="text/javascript" src="./js/Init.js"></script>
@@ -99,9 +99,12 @@
 				<div id="stat_player2"><span id="name_player2">플레이어2</span> : <span id="money_player2">소유금액</span></div>
 				<div id="stat_player3"><span id="name_player3">플레이어3</span> : <span id="money_player3">소유금액</span></div>
 			</div>
-			<div id="qrcode">QR CODE</div>
+			<div class="qrcode">QR CODE</div>
 			<div id="log">Log</div>
 		</div>
-		<div id="initPage">초기 페이지입니다.</div>
+		<div id="initPage">
+			<h1>초기 페이지입니다.</h1>
+			<div class="qrcode">QR CODE</div>
+		</div>
 	</body>
 </html>

@@ -1,4 +1,13 @@
+var mHost = "boom1492.iptime.org";
+var junction = {};
+var UUID = null;
+
 function init(){    
+    
+    UUID = randomUUID();
+    var QR_src = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl="+"http://"+mHost+"/pcsync?sessionId="+UUID;
+    $('.qrcode').html("<img src='"+QR_src+"'>");
+        
     var mHeight = document.body.clientHeight;
     var mWidth = document.body.clientWidth;
     var Field_table_list = $('#boardtable td:not(.dummy)');
