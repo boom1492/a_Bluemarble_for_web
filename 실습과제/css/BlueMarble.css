@@ -1,0 +1,57 @@
+@CHARSET "EUC-KR";
+
+*{
+	font-size: small;
+}
+#header{
+	height: 20px;
+	background-color: green;
+}
+#board{
+	float:left;
+	width: 80%;
+	background-color: skyblue;
+}
+#status{
+	float:right;
+	width: 20%;
+	background-color: blue;
+}
+#boardtable td:not(.dummy){
+	width:100px;
+	height:48px;
+	text-align:center;
+	background-color: gray;
+	-moz-border-radius: 5px; /*¸ðÁú¶ó*/
+	-webkit-border-radius: 5px; /*À¥Å¶*/
+	/*IE9+,FF4+,chrome,Safari5,+opera*/
+	border-radius: 5px;
+	opacity: 0.7;
+}
+
+#log{
+	background-color: black;
+	color: white;
+	overflow: scroll;
+	height: 500px;
+}
+*{
+	margin: 0 0 0 0;
+	padding: 0 0 0 0;
+}
+.f_bottom_1{
+	color:green;
+}
+.f_bottom_2{
+	color:yellow;
+}
+.f_bottom_3{
+	color:red;
+}
+
+#initPage{
+	text-align: center;
+	margin: 50px;
+	font-size: 20px;
+	font-family: "¸¼Àº °íµñ";
+}
