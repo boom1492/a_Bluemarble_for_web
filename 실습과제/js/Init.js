@@ -6,7 +6,9 @@ function init(){
     
     UUID = randomUUID();
     var QR_src = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl="+"http://"+mHost+"/pcsync?sessionId="+UUID;
-    $('.qrcode').html("<img src='"+QR_src+"'>");
+    var str = "<img src='"+QR_src+"'>";
+    str += "<br/> <h1>" + UUID + "</h1>";
+    $('.qrcode').html(str);
         
     var mHeight = document.body.clientHeight;
     var mWidth = document.body.clientWidth;
@@ -395,4 +397,10 @@ function init(){
     
     $('#initPage').show();
     $('#body').hide();
+    
+    for(i=0;i<4;i++){
+        $('#init_player'+i).hide();
+        $('#ready_player'+i).hide();
+        $('#stat_player'+i).hide();
+    }
 }

@@ -15,7 +15,9 @@
 	 	<link rel="stylesheet" href="css/BlueMarble.css" type="text/css"/> 
 	</head>
 	<body>
-		<div id="header">Debug Navigation : <input type="text" id="testBox"></input></div>
+		<div id="header">Debug Navigation : <input type="text" id="testBox"></input>
+			<span id="connection">●</span>
+		</div>
 		<div id="body">
 			<div id="board">
 				<table id="boardtable">
@@ -94,10 +96,10 @@
 			</div>
 			<div id="status">게임 진행 정보
 				<br/>플레이어 참여 정보
-				<div id="stat_player0"><span id="name_player0">플레이어0</span> : <span id="money_player0">소유금액</span></div>
-				<div id="stat_player1"><span id="name_player1">플레이어1</span> : <span id="money_player1">소유금액</span></div>
-				<div id="stat_player2"><span id="name_player2">플레이어2</span> : <span id="money_player2">소유금액</span></div>
-				<div id="stat_player3"><span id="name_player3">플레이어3</span> : <span id="money_player3">소유금액</span></div>
+				<div id="stat_player0"><span class="name_player0">플레이어0</span> : <span id="money_player0">소유금액</span></div>
+				<div id="stat_player1"><span class="name_player1">플레이어1</span> : <span id="money_player1">소유금액</span></div>
+				<div id="stat_player2"><span class="name_player2">플레이어2</span> : <span id="money_player2">소유금액</span></div>
+				<div id="stat_player3"><span class="name_player3">플레이어3</span> : <span id="money_player3">소유금액</span></div>
 			</div>
 			<div class="qrcode">QR CODE</div>
 			<div id="log">Log</div>
@@ -105,6 +107,13 @@
 		<div id="initPage">
 			<h1>초기 페이지입니다.</h1>
 			<div class="qrcode">QR CODE</div>
+			<div id="player_info">
+				<div id="init_player0"><div class="name_player0">플레이어0</div><div id="ready_player0">Ready</div></div>
+				<div id="init_player1"><div class="name_player1">플레이어1</div><div id="ready_player1">Ready</div></div>
+				<div id="init_player2"><div class="name_player2">플레이어2</div><div id="ready_player2">Ready</div></div>
+				<div id="init_player3"><div class="name_player3">플레이어3</div><div id="ready_player3">Ready</div></div>
+			</div>
+	
 		</div>
 	</body>
 </html>

@@ -36,33 +36,34 @@ function Player(number, IMEI) {
     this.money = 0;
     this.playerName = "player" + this.number;
     this.countAlone = 0;
-}
-
-function setName(player, name){
-    Player_list[player].playerName = name;
+    this.ready = 0;
+    
 }
 
 function test() {
     //test code
-    joinPlayer("123");
-    joinPlayer("321");
+    joinPlayer("123", "개똥");
+    joinPlayer("321", "스티브");
     movePlayer(0, 5);
     movePlayer(1, 3);
     movePlayer(1, 7);
-    joinPlayer("3432");
+    joinPlayer("3432", "제임스");
     movePlayer(2, 1);
-    joinPlayer("324");
+    joinPlayer("324", "마리오");
     movePlayer(3, 10);    
-    startGame();
 }
 
-function joinPlayer(IMEI) {
+function joinPlayer(IMEI, name) {
     for( i = 0; i < 4; i++) {
         if(Player_number[i] == 0) {
             Player_list[i] = new Player(i, IMEI);
+            Player_list[i].playerName = name;
             Player_number[i] = 1;
             Player_list[i].money = 2000000;
-            $('#log').append("<br/>플레이어" + i + " 접속");
+            $('#log').append("<br/>" + Player_list[i].playerName + " 접속");
+            $('.name_player'+i).html(Player_list[i].playerName);
+            $('#init_player'+i).show();
+            $('#stat_player'+i).show();
             redraw(i);
             return i;
         }
@@ -72,6 +73,9 @@ function joinPlayer(IMEI) {
 }
 
 function leavePlayer(number) {
+    $('.name_player'+number).html("");
+    $('#init_player'+number).hide();
+    $('#stat_player'+number).hide();
     Field_list[Player_list[number].location].td.css('background-color', '');
     Field_list[Player_list[number].location].td.css('opacity', '0.7');
     Player_list[number] = "";
@@ -253,6 +257,8 @@ function redraw(player){
     }
 }
 function startGame() {
+    $('#body').show();
+    $('#initPage').hide();
     var cnt = 0;
     for( i = 0; i < 4; i++) {
         if(Player_number == 1) {
@@ -268,10 +274,60 @@ function startGame() {
 
 }
 
+function ready(number){
+    Player_list[number].ready = 1;
+    $('#ready_player'+number).show();
+    var cnt = 0;
+    var cnt_ready = 0;
+    for(i=0;i<4;i++){
+        cnt += Player_number[i];
+        if(Player_number[i]){
+            cnt_ready += Player_list[i].ready;
+        }
+    }
+    if(cnt==cnt_ready && cnt>=2){
+        startGame();
+    }
+}
+
+function setJunction(){
+    var script = {ad:"Bluemarble", sessionID:UUID, host:mHost};
+        junction.onActivityJoin = function(){
+        }
+        junction.onMessageReceived = function(msg){
+            if(msg.service == "join"){
+                var number = 0;
+                if(msg.IMEI==null){
+                    alert("잘못된 Join");
+                } else{
+                    number = joinPlayer(msg.IMEI, msg.name);
+                    junction.sendMessageToSession({'service':'ackjoin', 'number':number});
+                }
+            }
+            else if(msg.service == "leave"){
+                if(msg.number==null){
+                    alert("잘못된 leave");
+                } else{
+                    leavePlayer(msg.number);
+                }
+            }
+            else if(msg.service == "ready"){
+                if(msg.number==null){
+                    alert("잘못된 ready");
+                } else{
+                    ready(msg.number);
+                }
+            }
+            else if(msg.service == "action"){
+            }
+        }
+        JX.getInstance(mHost).newJunction(script, junction);
+}
 
 $(document).ready(function() {
     Player_color = ['red', 'blue', 'green', 'yellow'];
     init();
+    setJunction();
     //test();
     $('#testBox').keydown(function(e) {
     if(e.keyCode == 13)
