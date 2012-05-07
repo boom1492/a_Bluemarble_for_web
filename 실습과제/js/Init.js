@@ -4,10 +4,10 @@ var UUID = null;
 
 function init(){    
     
-    UUID = randomUUID();
+    UUID = randomUUID_lite();
     var QR_src = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl="+"http://"+mHost+"/pcsync?sessionId="+UUID;
     var str = "<img src='"+QR_src+"'>";
-    str += "<br/> <h1>" + UUID + "</h1>";
+    str += "<br/> <h1>ID : " + UUID + "</h1>";
     $('.qrcode').html(str);
         
     var mHeight = document.body.clientHeight;

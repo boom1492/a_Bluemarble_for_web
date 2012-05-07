@@ -857,7 +857,17 @@ function randomUUID() {
     return s.join('');
 }
 
+function randomUUID_lite() {
+    var s = [], itoh = '0123456789';
+    // Make array of random hex digits. The UUID only has 32 digits in it, but we
+    // allocate an extra items to make room for the '-'s we'll be inserting.
+    for (var i = 0; i <8; i++) s[i] = Math.floor(Math.random()*10);
 
+    // Convert to hex chars
+    for (var i = 0; i <8; i++) s[i] = itoh[s[i]];
+
+    return s.join('');
+}
 
 // parseUri 1.2.2
 // (c) Steven Levithan <stevenlevithan.com>

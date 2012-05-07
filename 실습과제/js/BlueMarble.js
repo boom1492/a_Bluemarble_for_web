@@ -37,7 +37,7 @@ function Player(number, IMEI) {
     this.playerName = "player" + this.number;
     this.countAlone = 0;
     this.ready = 0;
-    
+
 }
 
 function test() {
@@ -50,7 +50,7 @@ function test() {
     joinPlayer("3432", "제임스");
     movePlayer(2, 1);
     joinPlayer("324", "마리오");
-    movePlayer(3, 10);    
+    movePlayer(3, 10);
 }
 
 function joinPlayer(IMEI, name) {
@@ -60,10 +60,10 @@ function joinPlayer(IMEI, name) {
             Player_list[i].playerName = name;
             Player_number[i] = 1;
             Player_list[i].money = 2000000;
-            $('#log').append("<br/>" + Player_list[i].playerName + " 접속");
-            $('.name_player'+i).html(Player_list[i].playerName);
-            $('#init_player'+i).show();
-            $('#stat_player'+i).show();
+            $('#log').append("<br/><span class='name_player" + i + "'>" + Player_list[i].playerName + "</span> 접속");
+            $('.name_player' + i).html(Player_list[i].playerName);
+            $('#init_player' + i).show();
+            $('#stat_player' + i).show();
             redraw(i);
             return i;
         }
@@ -73,14 +73,15 @@ function joinPlayer(IMEI, name) {
 }
 
 function leavePlayer(number) {
-    $('.name_player'+number).html("");
-    $('#init_player'+number).hide();
-    $('#stat_player'+number).hide();
+    $('#log').append("<br/><span class='name_player" + number + "'>" + Player_list[number].playerName + "</span> 퇴장");
+    $('.name_player' + number).html("");
+    $('#init_player' + number).hide();
+    $('#stat_player' + number).hide();
+    $('#ready_player' + number).hide();
     Field_list[Player_list[number].location].td.css('background-color', '');
     Field_list[Player_list[number].location].td.css('opacity', '0.7');
-    Player_list[number] = "";
+    Player_list[number] = null;
     Player_number[number] = 0;
-    $('#log').append("<br/>플레이어" + number + " 퇴장");
 }
 
 function movePlayer(player, index) {
@@ -90,10 +91,8 @@ function movePlayer(player, index) {
     Field_list[index].td.css('background-color', Player_color[player]);
     Field_list[index].td.css('opacity', 1);
 
-    $('#log').append("<br/>플레이어" + player + " " + Field_list[index].name + "(으)로 이동");
+    $('#log').append("<br/><span class='name_player" + player + "'>" + Player_list[player].playerName + "</span> " + Field_list[index].name + "(으)로 이동");
     redraw(player);
-    actionNext(player, index);
-    
 }
 
 function actionNext(player, index) {
@@ -142,7 +141,7 @@ function actionNext(player, index) {
         Player_list[player].countAlone++;
     } else if(state == STATE_GOLDENKEY) {
 
-    } else if(state == STATE_TOLL){
+    } else if(state == STATE_TOLL) {
         if(Field_list[index].owner == -1) {
             state = STATE_BUYLAND;
             //구매의사
@@ -164,8 +163,9 @@ function actionNext(player, index) {
     }
     redraw(player);
 }
-function salary(player){
-    Player_list[player].money+=200000;
+
+function salary(player) {
+    Player_list[player].money += 200000;
     redraw(player);
 }
 
@@ -186,6 +186,7 @@ function buyLand(player, index) {
         } else {
             Player_list[player].money -= Field_list[index].value;
             Field_list[index].owner = player;
+            $('#log').append("<br/><span class='name_player" + player + "'>" + Player_list[player].playerName + "</span> " + Field_list[index].name + "구매");
             redraw(player);
             return true;
         }
@@ -204,6 +205,8 @@ function build(player, index, building) {
         val = Field_list[index].price_hotel;
     }
     if(Field_list[index].owner == player) {
+
+        var build_name;
         if(Player_list[player].money < val) {
             alert("소유 금액 부족");
             return false;
@@ -211,19 +214,27 @@ function build(player, index, building) {
         } else {
             switch(building) {
                 case 0:
+                    build_name = "민박";
                     Field_list[index].villa = 1;
                     Player_list[player].money -= Field_list[index].price_villa;
                     break;
                 case 1:
+                    build_name = "빌딩";
                     Field_list[index].building = 1;
                     Player_list[player].money -= Field_list[index].price_building;
                     break;
                 case 2:
+                    build_name = "호텔";
                     Field_list[index].hotel = 1;
                     Player_list[player].money -= Field_list[index].price_hotel;
                     break;
+                default:
+                    alert("유효하지 않은 건물");
+                    return false;
+
             }
         }
+        $('#log').append("<br/><span class='name_player" + player + "'>" + Player_list[player].playerName + "</span> " + build_name + "건설");
         redraw(player);
         return true;
     } else {
@@ -234,28 +245,38 @@ function build(player, index, building) {
     return false;
     // 예외
 }
-function dice(player, n1, n2){
-    if(n1==n2){
+
+function dice(player, n1, n2) {
+    var db = false;
+    if(n1 == n2) {
         Player_list[player].countAlone = 0;
-        mTurnState = STATE_DOUBLE;
+        db = true;
     }
-    movePlayer(player, Player_list[player].location+n1+n2);
+    var nextLocation = Player_list[player].location + n1 + n2;
+    if(nextLocation>=40){
+        salary(player);
+        nextLocation -= 40;
+    }
+    movePlayer(player, nextLocation);
+    return db;
 }
-function redraw(player){
-    $('#money_player'+player).html(Player_list[player].money);
-    $('#name_player'+player).html(Player_list[player].playerName);
-    
-    if(Field_list[Player_list[player].location].villa==1){
+
+function redraw(player) {
+    $('#money_player' + player).html(Player_list[player].money);
+    $('#name_player' + player).html(Player_list[player].playerName);
+
+    if(Field_list[Player_list[player].location].villa == 1) {
         Field_list[Player_list[player].location].td.children().children('.f_bottom').children('.f_bottom_1').css('opacity', 1.0);
     }
-    if(Field_list[Player_list[player].location].building==1){
+    if(Field_list[Player_list[player].location].building == 1) {
         Field_list[Player_list[player].location].td.children().children('.f_bottom').children('.f_bottom_2').css('opacity', 1.0);
     }
-    if(Field_list[Player_list[player].location].hotel==1){
+    if(Field_list[Player_list[player].location].hotel == 1) {
         Field_list[Player_list[player].location].td.children().children('.f_bottom').children('.f_bottom_3').css('opacity', 1.0);
-        
+
     }
 }
+
 function startGame() {
     $('#body').show();
     $('#initPage').hide();
@@ -265,64 +286,178 @@ function startGame() {
             cnt++;
         }
     }
-    mTurnNumber = 0;
-    mTurnState = 0;
-    
-    for(i=0;i<4;i++){
-        $('#money_player'+i).html(Player_list[i].money);
+    for( i = 0; i < 4; i++) {
+        if(Player_number[i] == 1) {
+            mTurnNumber = i;
+            break;
+        }
+    }
+    mTurnState = STATE_DICE;
+
+    for( i = 0; i < 4; i++) {
+        if(Player_number[i]==1)
+            $('#money_player' + i).html(Player_list[i].money);
+    }
+    turn(mTurnNumber, STATE_DICE);
+}
+
+function nextTurn() {
+    while(true) {
+        mTurnNumber++;
+        if(mTurnNumber == 4) {
+            mTurnNumber = 0;
+        }
+        if(Player_number[mTurnNumber] == 1) {
+            break;
+        }
+    }
+    turn(mTurnNumber, STATE_DICE);
+}
+
+function turn(number, state) {
+
+    if(state == STATE_DICE) {
+        var str = Player_list[number].playerName + "님의 차례입니다. 주사위를 굴려주세요.";
+        $('#turnInfo').html(str);
+        junction.sendMessageToSession({
+            'service' : 'turn',
+            'number' : number,
+            'state' : state
+        });
+    } else if(state == STATE_BUYLAND) {
+        var str = Player_list[number].playerName + "님, " + Field_list[Player_list[number].location].name + "을 매입하시겠습니까?";
+        $('#turnInfo').html(str);
+        junction.sendMessageToSession({
+            'service' : 'turn',
+            'number' : number,
+            'state' : state
+        });
+    } else if(state == STATE_BUILD) {
+        var str = Player_list[number].playerName + "님, " + Field_list[Player_list[number].location].name + "에 건물을 건설 하시겠습니까?";
+        $('#turnInfo').html(str);
+        junction.sendMessageToSession({
+            'service' : 'turn',
+            'number' : number,
+            'state' : state
+        });
     }
 
 }
 
-function ready(number){
+function ready(number) {
     Player_list[number].ready = 1;
-    $('#ready_player'+number).show();
+    $('#ready_player' + number).show();
     var cnt = 0;
     var cnt_ready = 0;
-    for(i=0;i<4;i++){
+    for( i = 0; i < 4; i++) {
         cnt += Player_number[i];
-        if(Player_number[i]){
+        if(Player_number[i]) {
             cnt_ready += Player_list[i].ready;
         }
     }
-    if(cnt==cnt_ready && cnt>=2){
+    if(cnt == cnt_ready && cnt >= 2) {
         startGame();
     }
 }
 
-function setJunction(){
-    var script = {ad:"Bluemarble", sessionID:UUID, host:mHost};
-        junction.onActivityJoin = function(){
+function setJunction() {
+    var script = {
+        ad : "Bluemarble",
+        sessionID : UUID,
+        host : mHost
+    };
+    junction.onActivityJoin = function() {
+        junction.sendMessageToSession({
+            'service' : 'check'
+        });
+    }
+    junction.onMessageReceived = function(msg) {
+        if(msg.service == "join") {
+            var number = 0;
+            if(msg.IMEI == null) {
+                alert("잘못된 Join");
+            } else {
+                number = joinPlayer(msg.IMEI, msg.name);
+                junction.sendMessageToSession({
+                    'service' : 'ackjoin',
+                    'IMEI' : msg.IMEI,
+                    'number' : number
+                });
+            }
+        } else if(msg.service == "leave") {
+            if(msg.number == null) {
+                alert("잘못된 leave");
+            } else {
+                leavePlayer(msg.number);
+            }
+        } else if(msg.service == "ready") {
+            if(msg.number == null) {
+                alert("잘못된 ready");
+            } else {
+                ready(msg.number);
+            }
+        } else if(msg.service == "action") {
+            if(msg.number == null) {
+                alert("잘못된 플레이어");
+            } else {
+                if(msg.state == STATE_DICE) {
+                    var db = dice(msg.number, msg.n1, msg.n2);
+                    if(db == true) {
+                        // junction.sendMessageToSession({
+                            // 'service' : 'turn',
+                            // 'number' : msg.number,
+                            // 'state' : msg.state
+                        // });
+                        turn(msg.number, msg.state);
+                    } else {
+                        actionNext(msg.number, Player_list[msg.number].location);
+                        // junction.sendMessageToSession({
+                            // 'service' : 'turn',
+                            // 'number' : msg.number,
+                            // 'state' : STATE_BUYLAND
+                        // });
+                        turn(msg.number, STATE_BUYLAND);
+                    }
+                } else if(msg.state == STATE_BUYLAND) {
+                    if(msg.agree == 1) {
+                        buyLand(msg.number, Player_list[msg.number].location);
+                        if(Field_list[Player_list[msg.number].location].available == 1) {
+                            // junction.sendMessageToSession({
+                                // 'service' : 'turn',
+                                // 'number' : msg.number,
+                                // 'state' : STATE_BUILD
+                            // });
+                            turn(msg.number,STATE_BUILD);
+                        } else {
+                            nextTurn();
+                        }
+                    } else {
+                        nextTurn();
+                    }
+                } else if(msg.state == STATE_BUILD) {
+                    if(msg.build == 3) {
+                        nextTurn();
+                    } else {
+                        build(msg.number, Player_list[msg.number].location, msg.build);
+                        nextTurn();
+                    }
+                }
+            }
+
+        } else if(msg.service == "check") {
+            junction.sendMessageToSession({
+                'service' : 'exist',
+                'UUID' : UUID
+            });
+        } else if(msg.service == "exist") {
+            if(UUID != msg.UUID) {
+                location.reload();
+            }
         }
-        junction.onMessageReceived = function(msg){
-            if(msg.service == "join"){
-                var number = 0;
-                if(msg.IMEI==null){
-                    alert("잘못된 Join");
-                } else{
-                    number = joinPlayer(msg.IMEI, msg.name);
-                    junction.sendMessageToSession({'service':'ackjoin', 'number':number});
-                }
-            }
-            else if(msg.service == "leave"){
-                if(msg.number==null){
-                    alert("잘못된 leave");
-                } else{
-                    leavePlayer(msg.number);
-                }
-            }
-            else if(msg.service == "ready"){
-                if(msg.number==null){
-                    alert("잘못된 ready");
-                } else{
-                    ready(msg.number);
-                }
-            }
-            else if(msg.service == "action"){
-            }
-        }
-        JX.getInstance(mHost).newJunction(script, junction);
+    }
+    JX.getInstance(mHost).newJunction(script, junction);
 }
+
 
 $(document).ready(function() {
     Player_color = ['red', 'blue', 'green', 'yellow'];
@@ -330,9 +465,7 @@ $(document).ready(function() {
     setJunction();
     //test();
     $('#testBox').keydown(function(e) {
-    if(e.keyCode == 13)
-        eval($('#testBox').val());
+        if(e.keyCode == 13)
+            eval($('#testBox').val());
     });
-    
 });
-
