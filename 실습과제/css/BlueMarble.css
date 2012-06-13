@@ -2,6 +2,7 @@
 
 *{
 	font-size: small;
+	font-family: "¸¼Àº °íµñ";
 }
 #header{
 	height: 20px;
@@ -111,7 +112,7 @@
 #initPage{
 	text-align: center;
 	margin: 50px;
-	font-family: "¸¼Àº °íµñ";
+	
 }
 #connection{
 	margin-top: 2px;

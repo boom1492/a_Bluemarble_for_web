@@ -28,10 +28,10 @@ function Field(name) {
     this.available = 1;
 }
 
-function Player(number, IMEI) {
+function Player(number, actorID) {
     this.number = number;
     this.location = 0;
-    this.IMEI = IMEI;
+    this.actorID = actorID;
     this.item = {};
     this.money = 0;
     this.playerName = "player" + this.number;
@@ -53,11 +53,14 @@ function test() {
     movePlayer(3, 10);
 }
 
-function joinPlayer(IMEI, name) {
+function joinPlayer(actorID, name) {
     for( i = 0; i < 4; i++) {
         if(Player_number[i] == 0) {
-            Player_list[i] = new Player(i, IMEI);
+            Player_list[i] = new Player(i, actorID);
             Player_list[i].playerName = name;
+            if(name==null || name ==""){
+                Player_list[i].playerName = "플레이어" + i;
+            }
             Player_number[i] = 1;
             Player_list[i].money = 2000000;
             $('#log').append("<br/><span class='name_player" + i + "'>" + Player_list[i].playerName + "</span> 접속");
@@ -74,13 +77,13 @@ function joinPlayer(IMEI, name) {
 
 function leavePlayer(number) {
     $('#log').append("<br/><span class='name_player" + number + "'>" + Player_list[number].playerName + "</span> 퇴장");
-    $('.name_player' + number).html("");
+    //$('.name_player' + number).html("");
     $('#init_player' + number).hide();
     $('#stat_player' + number).hide();
     $('#ready_player' + number).hide();
     Field_list[Player_list[number].location].td.css('background-color', '');
     Field_list[Player_list[number].location].td.css('opacity', '0.7');
-    Player_list[number] = null;
+//    Player_list[number] = null;
     Player_number[number] = 0;
 }
 
@@ -330,7 +333,12 @@ function turn(number, state) {
         junction.sendMessageToSession({
             'service' : 'turn',
             'number' : number,
-            'state' : state
+            'state' : state,
+            'location' : Player_list[number].location,
+            'locationName' : Field_list[Player_list[number].location].name,
+            'locationValue' : Field_list[Player_list[number].location].value,
+            'locationOwner' : Field_list[Player_list[number].location].owner,
+            'playerMoney' : Player_list[number].money
         });
     } else if(state == STATE_BUILD) {
         var str = Player_list[number].playerName + "님, " + Field_list[Player_list[number].location].name + "에 건물을 건설 하시겠습니까?";
@@ -338,26 +346,34 @@ function turn(number, state) {
         junction.sendMessageToSession({
             'service' : 'turn',
             'number' : number,
-            'state' : state
+            'state' : state,
+            'location' : Player_list[number].location
         });
     }
 
 }
 
 function ready(number) {
-    Player_list[number].ready = 1;
-    $('#ready_player' + number).show();
-    var cnt = 0;
-    var cnt_ready = 0;
-    for( i = 0; i < 4; i++) {
-        cnt += Player_number[i];
-        if(Player_number[i]) {
-            cnt_ready += Player_list[i].ready;
+    if(Player_list[number].ready==0){
+        Player_list[number].ready = 1;
+        $('#ready_player' + number).show();
+        var cnt = 0;
+        var cnt_ready = 0;
+        for( i = 0; i < 4; i++) {
+            cnt += Player_number[i];
+            if(Player_number[i]) {
+                cnt_ready += Player_list[i].ready;
+            }
         }
+        if(cnt == cnt_ready && cnt >= 2) {
+            startGame();
+        }
+    } else{
+        Player_list[number].ready = 0;
+        $('#ready_player' + number).hide();
+        
     }
-    if(cnt == cnt_ready && cnt >= 2) {
-        startGame();
-    }
+    
 }
 
 function setJunction() {
@@ -368,23 +384,35 @@ function setJunction() {
     };
     junction.onActivityJoin = function() {
         junction.sendMessageToSession({
-            'service' : 'check'
+            'service' : 'check',
+            'actorID' : junction.actorID
         });
     }
     junction.onMessageReceived = function(msg) {
         if(msg.service == "join") {
             var number = 0;
-            if(msg.IMEI == null) {
+            if(msg.actorID == null) {
                 alert("잘못된 Join");
             } else {
-                number = joinPlayer(msg.IMEI, msg.name);
+                number = joinPlayer(msg.actorID, msg.name);
+                var temp = new Array(4);
+                for(i=0;i<4;i++){
+                    if(Player_list[i]==null){
+                        temp[i] = "";
+                    } else{
+                        temp[i] = Player_list[i].playerName;
+                    }
+                }
+                
                 junction.sendMessageToSession({
                     'service' : 'ackjoin',
-                    'IMEI' : msg.IMEI,
-                    'number' : number
+                    'actorID' : msg.actorID,
+                    'number' : number,
+                    'name' : Player_list[number].playerName,
+                    'namelist' : [temp[0], temp[1], temp[2], temp[3]]
                 });
             }
-        } else if(msg.service == "leave") {
+        } else if(msg.service == "exit") {
             if(msg.number == null) {
                 alert("잘못된 leave");
             } else {
@@ -416,7 +444,9 @@ function setJunction() {
                             // 'number' : msg.number,
                             // 'state' : STATE_BUYLAND
                         // });
-                        turn(msg.number, STATE_BUYLAND);
+                        if(Field_list[Player_list[msg.number].location].owner==-1){
+                            turn(msg.number, STATE_BUYLAND);
+                        }
                     }
                 } else if(msg.state == STATE_BUYLAND) {
                     if(msg.agree == 1) {
@@ -445,12 +475,7 @@ function setJunction() {
             }
 
         } else if(msg.service == "check") {
-            junction.sendMessageToSession({
-                'service' : 'exist',
-                'UUID' : UUID
-            });
-        } else if(msg.service == "exist") {
-            if(UUID != msg.UUID) {
+            if(msg.actorID!=junction.actorID){
                 location.reload();
             }
         }

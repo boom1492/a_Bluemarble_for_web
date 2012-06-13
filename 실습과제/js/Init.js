@@ -5,7 +5,7 @@ var UUID = null;
 function init(){    
     
     UUID = randomUUID_lite();
-    var QR_src = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl="+"http://"+mHost+"/pcsync?sessionId="+UUID;
+    var QR_src = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl="+"http://"+mHost+"/bm/Bluemarble_android.apk?sessionId="+UUID;
     var str = "<img src='"+QR_src+"'>";
     str += "<br/> <h1>ID : " + UUID + "</h1>";
     $('.qrcode').html(str);
@@ -16,7 +16,6 @@ function init(){
      // 필드 크기 초기화
     Field_table_list.css('width',mWidth/10);
     Field_table_list.css('height',(mHeight-40)/11);
-
     Field_list[0] = new Field("출발");
     Field_list[0].td = Field_table_list.eq(0);
 
