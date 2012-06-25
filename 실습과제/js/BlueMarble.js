@@ -156,10 +156,27 @@ function actionNext(player, index) {
             toll += (Field_list[index].hotel == 1) ? Field_list[index].toll_hotel : 0;
 
             if(Player_list[player].money < toll) {
-                //게임 오버
-                alert("게임오버");
+                //게임 오버 처리
+                junction.sendMessageToSession({
+                    'service' : 'gameover',
+                    'number' : player
+                });
+                $('#log').append("<br/><span class='name_player" + player + "'>" + Player_list[player].playerName + "</span> " + "게임 오버");
+      
             } else {
-                Player_list[player].money - toll;
+                // 비용 지불
+                Player_list[player].money -= toll;
+                // 땅의 주인은 그만큼의 비용을 받음
+                Player_list[Field_list[Player_list[player].location].owner].money += toll;
+                junction.sendMessageToSession({
+                    'service' : 'turn',
+                    'number' : player,
+                    'recevier_number' : Field_list[Player_list[player].location].owner,
+                    'state' : 'STATE_TOLL',
+                    'toll' : toll
+                });
+                $('#log').append("<br/><span class='name_player" + player + "'>" + Player_list[player].playerName + "</span> " + toll + "원 지불");
+      
             }
         }
 
@@ -217,7 +234,7 @@ function build(player, index, building) {
         } else {
             switch(building) {
                 case 0:
-                    build_name = "민박";
+                    build_name = "별장";
                     Field_list[index].villa = 1;
                     Player_list[player].money -= Field_list[index].price_villa;
                     break;
@@ -347,7 +364,18 @@ function turn(number, state) {
             'service' : 'turn',
             'number' : number,
             'state' : state,
-            'location' : Player_list[number].location
+            'location' : Player_list[number].location,
+            'locationName' : Field_list[Player_list[number].location].name,
+            'state_villa' : Field_list[Player_list[number].location].villa,
+            'state_building' : Field_list[Player_list[number].location].building,
+            'state_hotel' : Field_list[Player_list[number].location].hotel,
+            'value_villa' : Field_list[Player_list[number].location].price_villa,
+            'value_building' : Field_list[Player_list[number].location].price_building,
+            'value_hotel' : Field_list[Player_list[number].location].price_hotel,
+            'toll_villa' : Field_list[Player_list[number].location].toll_villa,
+            'toll_building' : Field_list[Player_list[number].location].toll_building,
+            'toll_hotel' : Field_list[Player_list[number].location].toll_hotel,
+            'playerMoney' : Player_list[number].money
         });
     }
 
@@ -444,8 +472,11 @@ function setJunction() {
                             // 'number' : msg.number,
                             // 'state' : STATE_BUYLAND
                         // });
-                        if(Field_list[Player_list[msg.number].location].owner==-1){
+                        if(Field_list[Player_list[msg.number].location].owner==-1 && Field_list[Player_list[msg.number].location].available==1){
                             turn(msg.number, STATE_BUYLAND);
+                        } else{
+                            //황금열쇠, 구매불가지역에 대한 처리
+                            nextTurn();
                         }
                     }
                 } else if(msg.state == STATE_BUYLAND) {

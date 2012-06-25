@@ -1,4 +1,4 @@
-var mHost = "boom1492.iptime.org";
+var mHost = "mobilesw.yonsei.ac.kr";
 var junction = {};
 var UUID = null;
 
