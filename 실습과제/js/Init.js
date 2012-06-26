@@ -9,13 +9,21 @@ function init(){
     var str = "<img src='"+QR_src+"'>";
     str += "<br/> <h1>ID : " + UUID + "</h1>";
     $('.qrcode').html(str);
-        
+    QR_src = "https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl="+"http://"+mHost+"/bm/Bluemarble_android.apk?sessionId="+UUID;
+    str = "<img src='"+QR_src+"'>";
+    str += "<br/> <h1>ID : " + UUID + "</h1>";
+    $('#qrcode_playing').html(str);    
+    
+    $('#log').change(function(){
+       $('#log').scroll(); 
+    });
     var mHeight = document.body.clientHeight;
     var mWidth = document.body.clientWidth;
     var Field_table_list = $('#boardtable td:not(.dummy)');
      // 필드 크기 초기화
     Field_table_list.css('width',mWidth/10);
     Field_table_list.css('height',(mHeight-40)/11);
+    $('.f_top').css('width' , mWidth/10);
     Field_list[0] = new Field("출발");
     Field_list[0].td = Field_table_list.eq(0);
 
@@ -377,15 +385,16 @@ function init(){
             case 28:
             case 32:    Field_list[i].available = 0; break;
             default: str += "<div class='f_bottom'>"+
-                "<span class='f_bottom_1'>●</span>"+
-                "<span class='f_bottom_2'>●</span>"+
-                "<span class='f_bottom_3'>●</span>"+
+                "<span class='f_bottom_1'>별장</span>"+
+                "<span class='f_bottom_2'>빌딩</span>"+
+                "<span class='f_bottom_3'>호텔</span>"+
                 "</div>";
                 break;
         }
         str += "</div>";
         Field_list[i].td.html(str);
     }    
+    
     $('.f_bottom_1').css('height', (mHeight-40)/33);
     $('.f_bottom_2').css('height', (mHeight-40)/33);
     $('.f_bottom_3').css('height', (mHeight-40)/33);

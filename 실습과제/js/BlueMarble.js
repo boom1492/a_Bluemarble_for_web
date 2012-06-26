@@ -7,6 +7,9 @@ var Player_number = [0, 0, 0, 0];
 var mTurnNumber = 0;
 var mTurnState = 0;
 var mFund = 0;
+
+var mColor = ['red', 'blue', 'green', 'yellow'];
+
 //복지기금
 var STATE_TOLL = 0, STATE_BUYLAND = 1, STATE_BUILD = 2, STATE_GOLDENKEY = 3, STATE_ALONE = 4, STATE_SPACETRIP = 5, STATE_FUND = 6, STATE_RECVFUND = 7, STATE_DICE = 8, STATE_DOUBLE = 9;
 
@@ -98,6 +101,17 @@ function movePlayer(player, index) {
     redraw(player);
 }
 
+function gameover(player){
+     junction.sendMessageToSession({
+                    'service' : 'gameover',
+                    'number' : player
+     });
+     Player_number[player] = 0;
+     leavePlayer(player);
+               
+     $('#log').append("<br/><span class='name_player" + player + "'>" + Player_list[player].playerName + "</span> " + "게임 오버");
+                
+}
 function actionNext(player, index) {
     var state = STATE_TOLL;
     switch(index) {
@@ -132,7 +146,7 @@ function actionNext(player, index) {
     }
     if(state == STATE_FUND) {
         if(Player_list[player].money < 150000) {
-            //게임오버
+            gameover(player);
         } else {
             Player_list[player].money -= 150000;
             mFund += 150000;
@@ -157,12 +171,7 @@ function actionNext(player, index) {
 
             if(Player_list[player].money < toll) {
                 //게임 오버 처리
-                junction.sendMessageToSession({
-                    'service' : 'gameover',
-                    'number' : player
-                });
-                $('#log').append("<br/><span class='name_player" + player + "'>" + Player_list[player].playerName + "</span> " + "게임 오버");
-      
+                gameover(player);
             } else {
                 // 비용 지불
                 Player_list[player].money -= toll;
@@ -294,6 +303,9 @@ function redraw(player) {
     if(Field_list[Player_list[player].location].hotel == 1) {
         Field_list[Player_list[player].location].td.children().children('.f_bottom').children('.f_bottom_3').css('opacity', 1.0);
 
+    }
+    if(Field_list[Player_list[player].location].owner!=-1){
+        Field_list[Player_list[player].location].td.children().children('.f_top').css('background-color', mColor[Field_list[Player_list[player].location].owner]);
     }
 }
 
@@ -472,7 +484,7 @@ function setJunction() {
                             // 'number' : msg.number,
                             // 'state' : STATE_BUYLAND
                         // });
-                        if(Field_list[Player_list[msg.number].location].owner==-1 && Field_list[Player_list[msg.number].location].available==1){
+                        if(Field_list[Player_list[msg.number].location].owner == -1 || Field_list[Player_list[msg.number].location].owner == msg.number && Field_list[Player_list[msg.number].location].available==1){
                             turn(msg.number, STATE_BUYLAND);
                         } else{
                             //황금열쇠, 구매불가지역에 대한 처리

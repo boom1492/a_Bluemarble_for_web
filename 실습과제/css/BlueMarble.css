@@ -20,8 +20,6 @@
 	color: white;
 }
 #boardtable td:not(.dummy){
-	width:100px;
-	height:48px;
 	text-align:center;
 	background-color: gray;
 	-moz-border-radius: 5px; /*¸ðÁú¶ó*/
@@ -36,23 +34,27 @@
 #log{
 	background-color: black;
 	color: white;
-	overflow: scroll;
-	height: 500px;
+	height: 300px;
+	overflow: auto;
 }
 *{
 	margin: 0 0 0 0;
 	padding: 0 0 0 0;
 }
 .f_bottom_1{
-	color:green;
+	color:white;
 }
 .f_bottom_2{
-	color:yellow;
+	color:white;
 }
 .f_bottom_3{
-	color:red;
+	color:white;
 }
-
+.f_top{
+	height: 3px;
+	color: white;
+	position: static;	
+}
 .name_player0{
 	color: red;
 	font-size: large;
